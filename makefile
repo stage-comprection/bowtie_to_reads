@@ -12,10 +12,10 @@ BUILD = $(BASEDIR)/build
 BIN = $(BASEDIR)/bin
 
 # Program name
-TARGET = filter_sam_output
+TARGET = bowtie_to_reads
 
 # Objects names
-OBJECTS = $(BUILD)/filter_sam_output.o $(BUILD)/utils.o
+OBJECTS = $(BUILD)/bowtie_to_reads.o $(BUILD)/utils.o $(BUILD)/bowtie_parser.o
 
 # Rules
 
