@@ -14,8 +14,8 @@ int main (int argc, char *argv[]) {
     //settings.pathToOutput + "temp_bowtie_corrected_" + settings.baseFileName
     string pathToReferenceGenome = argv[1];
     //settings.pathToOutput + "temp_formatted_bglue_" + settings.baseFileName;
-    BowtieParser parser(pathToReferenceGenome);
-    parser.getReadsFromReference(outputFilePath, noAlign);
+    BowtieParser parser(pathToReferenceGenome, outputFilePath, noAlign);
+    parser.getReadsFromReference();
 
 
     return 0;
