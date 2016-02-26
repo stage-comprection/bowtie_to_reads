@@ -67,12 +67,16 @@ void BowtieParser::getReadsFromReference(){
     int readSize, refId, refPos;
     bool revComp;
 
+    bool pflag = false;
+
     while(cin.getline(line, 5000)){
-        cout<<line<<"\n";
+        if (pflag == true) cout<<line<<"\n";
 
         splittedLine = split(line); // Split function is in utils, splits by '\t' by default
 
         name = splittedLine[0];
+
+        if (stoi(name) > 5128780) pflag = true;
 
         /* Bowtie output organisation (only relevant fields) in SAM format:
          * 0. Identifier / name of the aligned read
