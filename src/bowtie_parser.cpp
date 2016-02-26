@@ -100,11 +100,17 @@ void BowtieParser::getReadsFromReference(){
 
         } else {
 
+            cout<<"NOT ALIGNED";
+
             if (this->noAlign == "T" or this->noAlign == "True" or this->noAlign == "true" or this->noAlign == "TRUE"){
+
+                cout<<" 1 "<<endl;
 
                 this->outputFile << ">" + name + "\n" + "not_aligned\n";
 
             }else {
+
+                cout<<" 2"<<endl;
 
                 this->outputFile << ">" + name + "\n" + splittedLine[4] + "\n";
 

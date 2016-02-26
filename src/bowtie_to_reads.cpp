@@ -14,7 +14,6 @@ int main (int argc, char *argv[]) {
     //settings.pathToOutput + "temp_bowtie_corrected_" + settings.baseFileName
     string pathToReferenceGenome = argv[1];
     //settings.pathToOutput + "temp_formatted_bglue_" + settings.baseFileName;
-    cout<<noAlign<<endl;
     BowtieParser parser(pathToReferenceGenome, outputFilePath, noAlign);
     parser.getReadsFromReference();
 
