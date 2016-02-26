@@ -17,6 +17,11 @@ int main (int argc, char *argv[]) {
     BowtieParser parser(pathToReferenceGenome, outputFilePath, noAlign);
     parser.getReadsFromReference();
 
+    parser.outputFile.close();
+
+    ofstream logs;
+    logs.open("/home/rferon/project/output/SRR959239/logs.txt", ios::app);
+
 
     return 0;
 }
