@@ -66,12 +66,8 @@ void BowtieParser::getReadsFromReference(){
     string correctedSequence, name;
     int readSize, refId, refPos;
     bool revComp;
-    ofstream test;
-    test.open("/home/rferon/project/output/SRR959239/test.txt");
 
     while(cin.getline(line, 5000)){
-
-        test<<line<<"\n";
 
         splittedLine = split(line); // Split function is in utils, splits by '\t' by default
 
@@ -94,7 +90,7 @@ void BowtieParser::getReadsFromReference(){
 
             cout<<stoi(splittedLine[1])<<" :   ";
 
-            if (find(begin(this->goodFlags), end(this->goodFlags), stoi(splittedLine[1]))){
+            if (find(begin(this->goodFlags), end(this->goodFlags), stoi(splittedLine[1])) != end(this->goodFlags)){
                 cout<<"TRUE"<<endl;
                 revComp = true;
             } else {
