@@ -19,10 +19,6 @@ int main (int argc, char *argv[]) {
 
     parser.outputFile.close();
 
-    ofstream logs;
-    logs.open("/home/rferon/project/output/SRR959239/logs.txt", ios::app);
-
-
     return 0;
 }
 

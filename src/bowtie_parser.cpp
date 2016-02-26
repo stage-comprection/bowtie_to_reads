@@ -66,22 +66,12 @@ void BowtieParser::getReadsFromReference(){
     string correctedSequence, name;
     int readSize, refId, refPos;
     bool revComp;
-    ofstream logs;
-    logs.open("/home/rferon/project/output/SRR959239/logs.txt");
 
     while(cin.getline(line, 5000)){
 
-        logs<<name<<" - "<<"1"<<" - ";
-
         splittedLine = split(line); // Split function is in utils, splits by '\t' by default
 
-        logs<<"2"<<" - ";
-
         name = splittedLine[0];
-
-        logs<<"3"<<" - ";
-
-        logs<<"4"<<" - ";
 
         /* Bowtie output organisation (only relevant fields) in SAM format:
          * 0. Identifier / name of the aligned read
@@ -93,16 +83,10 @@ void BowtieParser::getReadsFromReference(){
 
         if (splittedLine[2] != "*"){
 
-            logs<<"5"<<" - ";
-
             refId = stoi(splittedLine[2]);
             refPos = stoi(splittedLine[3]);
 
-            logs<<"6"<<" - ";
-
             readSize = static_cast<int>(splittedLine[9].size());
-
-            logs<<"7"<<" - ";
 
             if (find(begin(this->goodFlags), end(this->goodFlags), stoi(splittedLine[1])) != end(this->goodFlags)){
                 revComp = true;
@@ -110,47 +94,23 @@ void BowtieParser::getReadsFromReference(){
                 revComp = false;
             }
 
-            logs<<"8"<<" - ";
-
             correctedSequence = this->getReferenceSequence(refId, refPos, readSize, revComp);
-
-            logs<<"9"<<" - ";
 
             this->outputFile << ">" + name + "\n" + correctedSequence + "\n";
 
-            logs<<"10"<<" - ";
-
         } else {
-
-            logs<<"11"<<" - ";
 
             if (this->noAlign == "T" or this->noAlign == "True" or this->noAlign == "true" or this->noAlign == "TRUE"){
 
-                logs<<"12"<<" - ";
-
                 this->outputFile << ">" + name + "\n" + "not_aligned\n";
-
-                logs<<"13"<<" - ";
 
             } else {
 
-                logs<<"14"<<" - ";
-
                 this->outputFile << ">" + name + "\n" + splittedLine[9] + "\n";
-
-                logs<<"15"<<" - ";
 
             }
 
         }
 
-        logs<<"\n";
-
     }  
-
-    logs<<"20"<<"\n";
-
-    this->outputFile.close();
-
-    logs<<"21"<<"\n";
 }
