@@ -113,4 +113,5 @@ void BowtieParser::getReadsFromReference(){
         }
 
     }  
+
 }
