@@ -68,6 +68,7 @@ void BowtieParser::getReadsFromReference(){
     bool revComp;
 
     while(cin.getline(line, 5000)){
+        cout<<line<<"\n";
 
         splittedLine = split(line); // Split function is in utils, splits by '\t' by default
 
@@ -88,13 +89,9 @@ void BowtieParser::getReadsFromReference(){
 
             readSize = static_cast<int>(splittedLine[9].size());
 
-            cout<<stoi(splittedLine[1])<<" :   ";
-
             if (find(begin(this->goodFlags), end(this->goodFlags), stoi(splittedLine[1])) != end(this->goodFlags)){
-                cout<<"TRUE"<<endl;
                 revComp = true;
             } else {
-                cout<<"FALSE"<<endl;
                 revComp = false;
             }
 
