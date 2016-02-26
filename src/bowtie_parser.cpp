@@ -44,7 +44,7 @@ void BowtieParser::getReferenceGenome(ifstream& referenceFile){
 // Returns sequence from a reference based on parameters obtained in the SAM output file (reference sequence number and position on this sequence).
 string BowtieParser::getReferenceSequence(const int& seqNumber, const int& position, const int& size, const bool& revComp){
 
-    string referenceRead = this->referenceGenome[seqNumber].substr(position, size);
+    string referenceRead = this->referenceGenome[seqNumber].substr(position -1, size);
 
     if (revComp == true){ // SAM file has a flag set to 16 when reverse complement was aligned (not entirely true, maybe need to check that later)
         return reverseComplement(referenceRead);
@@ -86,7 +86,7 @@ void BowtieParser::getReadsFromReference(){
             refId = stoi(splittedLine[2]);
             refPos = stoi(splittedLine[3]);
 
-            readSize = static_cast<int>(splittedLine[4].size());
+            readSize = static_cast<int>(splittedLine[9].size());
 
             if (find(begin(this->goodFlags), end(this->goodFlags), stoi(splittedLine[1]))){
                 revComp = true;
