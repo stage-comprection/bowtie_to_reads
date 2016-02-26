@@ -148,5 +148,9 @@ void BowtieParser::getReadsFromReference(){
 
     }  
 
+    logs<<"20"<<"\n";
+
     this->outputFile.close();
+
+    logs<<"21"<<"\n";
 }
