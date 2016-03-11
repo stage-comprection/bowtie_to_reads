@@ -69,47 +69,50 @@ void BowtieParser::getReadsFromReference(){
 
     while(cin.getline(line, 5000)){
 
-        splittedLine = split(line); // Split function is in utils, splits by '\t' by default
+        if (line[0] != '@'){
 
-        name = splittedLine[0];
+            splittedLine = split(line); // Split function is in utils, splits by '\t' by default
 
-        /* Bowtie output organisation (only relevant fields) in SAM format:
-         * 0. Identifier / name of the aligned read
-         * 1. Flags (between 16 and 32 if aligned on reverse complement)
-         * 2. Identifier / name of the reference sequence on which the read aligns ( = '*' if no alignment)
-         * 3. Starting position of the read on the reference sequence (1-based offset)
-         * 9. Read sequence
-         */
+            name = splittedLine[0];
 
-        if (splittedLine[2] != "*"){
+            /* Bowtie output organisation (only relevant fields) in SAM format:
+             * 0. Identifier / name of the aligned read
+             * 1. Flags (between 16 and 32 if aligned on reverse complement)
+             * 2. Identifier / name of the reference sequence on which the read aligns ( = '*' if no alignment)
+             * 3. Starting position of the read on the reference sequence (1-based offset)
+             * 9. Read sequence
+             */
 
-            refId = stoi(splittedLine[2]);
-            refPos = stoi(splittedLine[3]);
+            if (splittedLine[2] != "*"){
 
-            readSize = static_cast<int>(splittedLine[9].size());
+                refId = stoi(splittedLine[2]);
+                refPos = stoi(splittedLine[3]);
 
-            if (find(begin(this->goodFlags), end(this->goodFlags), stoi(splittedLine[1])) != end(this->goodFlags)){
-                revComp = true;
-            } else {
-                revComp = false;
-            }
+                readSize = static_cast<int>(splittedLine[9].size());
 
-            correctedSequence = this->getReferenceSequence(refId, refPos, readSize, revComp);
+                if (find(begin(this->goodFlags), end(this->goodFlags), stoi(splittedLine[1])) != end(this->goodFlags)){
+                    revComp = true;
+                } else {
+                    revComp = false;
+                }
 
-            this->outputFile << ">" + name + "\n" + correctedSequence + "\n";
+                correctedSequence = this->getReferenceSequence(refId, refPos, readSize, revComp);
 
-        } else {
-
-            if (this->noAlign == "T" or this->noAlign == "True" or this->noAlign == "true" or this->noAlign == "TRUE"){
-
-                this->outputFile << ">" + name + "\n" + "not_aligned\n";
+                this->outputFile << ">" + name + "\n" + correctedSequence + "\n";
 
             } else {
 
-                this->outputFile << ">" + name + "\n" + splittedLine[9] + "\n";
+                if (this->noAlign == "T" or this->noAlign == "True" or this->noAlign == "true" or this->noAlign == "TRUE"){
+
+                    this->outputFile << ">" + name + "\n" + "not_aligned\n";
+
+                } else {
+
+                    this->outputFile << ">" + name + "\n" + splittedLine[9] + "\n";
+
+                }
 
             }
-
         }
 
     }  
