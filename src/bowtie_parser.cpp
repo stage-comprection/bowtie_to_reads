@@ -1,12 +1,10 @@
 #include "bowtie_parser.h"
 
-using namespace std;
-
 
 // Creator for object BowtieParser - stores genome in memory
-BowtieParser::BowtieParser(string& referenceGenomePath, string& outputFilePath, string& noAlign){
+BowtieParser::BowtieParser(std::string& referenceGenomePath, std::string& outputFilePath, std::string& noAlign){
 
-    ifstream referenceGenomeFile;
+    std::ifstream referenceGenomeFile;
     referenceGenomeFile.open(referenceGenomePath.c_str());
     this->getReferenceGenome(referenceGenomeFile); // Loads reference genome in memory (DB graph contigs here)
 
@@ -20,13 +18,34 @@ BowtieParser::BowtieParser(string& referenceGenomePath, string& outputFilePath, 
 
 
 
+
+// Parser for cigar string
+std::vector<uint> BowtieParser::cigarParser(std::string& cigar){
+
+    std::vector<uint> positions;
+    std::regex to_match ("(\\d+)I");
+    std::smatch matches;
+
+    while (std::regex_search(cigar, matches, to_match)) {
+
+        positions.push_back(std::stoi(matches[1]));
+        cigar = matches.suffix().str();
+    }
+
+    return positions;
+}
+
+
+
+
+
 // Loads reference genome in memory as a vector of sequences. Identifiers are not stored because the reference file is processed before and sequence names are
 // set to the order of the sequence (first sequence is >0, second is >1 ...)
-void BowtieParser::getReferenceGenome(ifstream& referenceFile){
+void BowtieParser::getReferenceGenome(std::ifstream& referenceFile){
 
-    string line;
+    std::string line;
 
-    while(getline(referenceFile, line)){
+    while(std::getline(referenceFile, line)){
 
         if (line[0] not_eq '>'){
             this->referenceGenome.push_back(line);
@@ -35,24 +54,41 @@ void BowtieParser::getReferenceGenome(ifstream& referenceFile){
     }
 
     referenceFile.close();
-
 }
 
 
 
 
 // Returns sequence from a reference based on parameters obtained in the SAM output file (reference sequence number and position on this sequence).
-string BowtieParser::getReferenceSequence(const int& seqNumber, const int& position, const int& size, const bool& revComp){
+std::string BowtieParser::getReferenceSequence(uint& refNumber, uint& refPosition, uint& size, bool revComp){
 
-    string referenceRead = this->referenceGenome[seqNumber].substr(position -1, size);
+//    std::string cigar = samLine[5];
+//    std::vector<uint> insertions = this->cigarParser(cigar);
+//    std::string referenceRead = "";
 
-    if (revComp == true){ // SAM file has a flag set to 16 when reverse complement was aligned (not entirely true, maybe need to check that later)
+    referenceRead = this->referenceGenome[refNumber].substr(refPosition -1, size);
+
+    if (revComp){
         return reverseComplement(referenceRead);
     }
 
+//    } else {
+
+//        uint start = refPosition;
+
+//        for (uint i=0; i<insertions.size(); ++i){
+
+//            referenceRead += this->referenceGenome[refNumber].substr(start -1, insertions[i]);
+//            start += insertions[i] + 1;
+
+//        }
+
+//        referenceRead += this->referenceGenome[refNumber].substr(start -1, size - referenceRead.size());
+
+//    }
+
     return referenceRead;
 }
-
 
 
 
@@ -62,12 +98,13 @@ string BowtieParser::getReferenceSequence(const int& seqNumber, const int& posit
 void BowtieParser::getReadsFromReference(){
 
     char line[5000];
-    vector<string> splittedLine;
-    string correctedSequence, name;
-    int readSize, refId, refPos;
+    std::vector<std::string> splittedLine;
+    std::string correctedSequence, name;
+    uint size, refNumber, refPosition;
     bool revComp;
+    std::bitset<12> flag;
 
-    while(cin.getline(line, 5000)){
+    while(std::cin.getline(line, 5000)){
 
         if (line[0] != '@'){
 
@@ -77,26 +114,22 @@ void BowtieParser::getReadsFromReference(){
 
             /* Bowtie output organisation (only relevant fields) in SAM format:
              * 0. Identifier / name of the aligned read
-             * 1. Flags (between 16 and 32 if aligned on reverse complement)
+             * 1. Flags
              * 2. Identifier / name of the reference sequence on which the read aligns ( = '*' if no alignment)
              * 3. Starting position of the read on the reference sequence (1-based offset)
              * 9. Read sequence
              */
 
-            if (splittedLine[2] != "*"){
+            flag = std::bitset<12>(std::stoi(splittedLine[1]));
 
-                refId = stoi(splittedLine[2]);
-                refPos = stoi(splittedLine[3]);
+            if (is_mapped(flag)){
 
-                readSize = static_cast<int>(splittedLine[9].size());
+                refNumber = std::stoi(samLine[2]);
+                refPosition = std::stoi(samLine[3]);
+                size = static_cast<int>(samLine[9].size());
+                revComp = is_RC(flag);
 
-                if (find(begin(this->goodFlags), end(this->goodFlags), stoi(splittedLine[1])) != end(this->goodFlags)){
-                    revComp = true;
-                } else {
-                    revComp = false;
-                }
-
-                correctedSequence = this->getReferenceSequence(refId, refPos, readSize, revComp);
+                correctedSequence = this->getReferenceSequence(refNumber, refPosition, size, revComp);
 
                 this->outputFile << ">" + name + "\n" + correctedSequence + "\n";
 
@@ -111,10 +144,7 @@ void BowtieParser::getReadsFromReference(){
                     this->outputFile << ">" + name + "\n" + splittedLine[9] + "\n";
 
                 }
-
             }
         }
-
-    }  
-
+    }
 }
