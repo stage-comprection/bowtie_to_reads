@@ -66,7 +66,7 @@ std::string BowtieParser::getReferenceSequence(uint& refNumber, uint& refPositio
 //    std::vector<uint> insertions = this->cigarParser(cigar);
 //    std::string referenceRead = "";
 
-    referenceRead = this->referenceGenome[refNumber].substr(refPosition -1, size);
+    std::string referenceRead = this->referenceGenome[refNumber].substr(refPosition -1, size);
 
     if (revComp){
         return reverseComplement(referenceRead);
@@ -98,7 +98,7 @@ std::string BowtieParser::getReferenceSequence(uint& refNumber, uint& refPositio
 void BowtieParser::getReadsFromReference(){
 
     char line[5000];
-    std::vector<std::string> splittedLine;
+    std::vector<std::string> samLine;
     std::string correctedSequence, name;
     uint size, refNumber, refPosition;
     bool revComp;
@@ -108,9 +108,9 @@ void BowtieParser::getReadsFromReference(){
 
         if (line[0] != '@'){
 
-            splittedLine = split(line); // Split function is in utils, splits by '\t' by default
+            samLine = split(line); // Split function is in utils, splits by '\t' by default
 
-            name = splittedLine[0];
+            name = samLine[0];
 
             /* Bowtie output organisation (only relevant fields) in SAM format:
              * 0. Identifier / name of the aligned read
@@ -120,7 +120,7 @@ void BowtieParser::getReadsFromReference(){
              * 9. Read sequence
              */
 
-            flag = std::bitset<12>(std::stoi(splittedLine[1]));
+            flag = std::bitset<12>(std::stoi(samLine[1]));
 
             if (is_mapped(flag)){
 
@@ -141,7 +141,7 @@ void BowtieParser::getReadsFromReference(){
 
                 } else {
 
-                    this->outputFile << ">" + name + "\n" + splittedLine[9] + "\n";
+                    this->outputFile << ">" + name + "\n" + samLine[9] + "\n";
 
                 }
             }
